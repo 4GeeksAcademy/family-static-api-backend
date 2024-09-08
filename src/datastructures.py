@@ -59,7 +59,7 @@ class FamilyStructure:
         for member in self._members:
             if member['id'] == id:
                 return member
-        return "Error: Member not found"
+        return 'Member not found'
 
     # this method is done, it returns a list with all the family members
     def get_all_members(self):

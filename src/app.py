@@ -25,34 +25,50 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-#endpoints ojoooooo
+# endpoints siiiii
 @app.route('/members', methods=['GET'])
 def handle_hello():
+    try:
+        # this is how you can use the Family datastructure by calling its methods
+        members = jackson_family.get_all_members()
 
-    # this is how you can use the Family datastructure by calling its methods
-   
+        if members == []:
+            return jsonify({"Error": "Members not found"}), 404
+        return jsonify(members), 200
+        
+    except Exception as e:
+        return jsonify({"error": "Internal server error", "message": str(e)}), 500
 
-    members = jackson_family.get_all_members()
-    response_body = {
-        "family": members
-    }
-
-
-    return jsonify(response_body), 200
-# un solo miembro con get
+# obtener la info de un solo member
 @app.route('/member/<int:member_id>', methods=['GET'])
 def get_member(member_id):
-    print(member_id)
-    # this is how you can use the Family datastructure by calling its methods
-   
- 
-    # members = jackson_family.get_all_members()
-    # response_body = {
-    #     "family": members
-    # }
+    try:
+        a_member = jackson_family.get_member(member_id)
+        if a_member == 'Member not found':
+            return jsonify({'error':'Member not found'}), 404
+        return jsonify(a_member), 200
+    except Exception as e:
+        return jsonify({'error': 'Internal server error', 'message':str(e)}), 500
+@app.route('/member', methods=['POST'])
+def add_new_member():
+    try:
+        member = request.get_json()
+        if not member:
+            return jsonify({'error':'Invalid information'}), 400
+        update_members = jackson_family.add_member(member)
+        return jsonify(update_members), 200
+    except Exception as e:
+        return jsonify({'error': 'Internal server error', 'message':str(e)}), 500
 
-    return jsonify("response_body"), 200
-
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+    try:
+        delete_member = jackson_family.delete_member(member_id)
+        if not delete_member:
+            return jsonify({'error':'Member not found'}), 404
+        return jsonify({'done': True}), 200
+    except Exception as e:
+        return jsonify({'error': 'Internal server error', 'message':str(e)}), 500
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
